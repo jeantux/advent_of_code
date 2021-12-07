@@ -1,0 +1,63 @@
+# Day 2: Dive!
+
+## Setup
+
+```elixir
+Mix.install([
+  {:kino, "~> 0.4.1"}
+])
+```
+
+## Part One
+
+```elixir
+commands = Kino.Input.textarea("Paste here the commands")
+```
+
+```elixir
+%{depth: depth, position: position} =
+  commands
+  |> Kino.Input.read()
+  |> String.split("\n", trim: true)
+  |> Enum.map(&String.split/1)
+  |> Enum.map(fn [c, p] -> [String.to_atom(c), String.to_integer(p)] end)
+  |> Enum.reduce(%{depth: 0, position: 0}, fn [key, value], acc ->
+    {type, result} =
+      case key do
+        :forward -> {:position, acc.position + value}
+        :down -> {:depth, acc.depth + value}
+        :up -> {:depth, acc.depth - value}
+      end
+
+    Map.put(acc, type, result)
+  end)
+
+depth * position
+```
+
+## Part Two
+
+```elixir
+%{depth: depth, position: position} =
+  commands
+  |> Kino.Input.read()
+  |> String.split("\n", trim: true)
+  |> Enum.map(&String.split/1)
+  |> Enum.map(fn [c, p] -> [String.to_atom(c), String.to_integer(p)] end)
+  |> Enum.reduce(%{depth: 0, position: 0, aim: 0}, fn [key, value], acc ->
+    case key do
+      :forward ->
+        acc
+        |> Map.put(:position, acc.position + value)
+        |> Map.put(:depth, acc.depth + value * acc.aim)
+
+      :down ->
+        Map.put(acc, :aim, acc.aim + value)
+
+      :up ->
+        Map.put(acc, :aim, acc.aim - value)
+    end
+  end)
+
+depth * position
+```
