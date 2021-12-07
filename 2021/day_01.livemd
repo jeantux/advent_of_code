@@ -1,0 +1,36 @@
+# Day 1: Sonar Sweep
+
+## Setup
+
+```elixir
+Mix.install([
+  {:kino, "~> 0.4.1"}
+])
+```
+
+## Part One
+
+```elixir
+reports = Kino.Input.textarea("Paste here results:")
+```
+
+```elixir
+reports
+|> Kino.Input.read()
+|> String.split("\n", trim: true)
+|> Enum.map(&String.to_integer/1)
+|> Enum.chunk_every(2, 1, :discard)
+|> Enum.count(fn [n1, n2] -> n2 > n1 end)
+```
+
+## Part Two
+
+```elixir
+reports
+|> Kino.Input.read()
+|> String.split("\n", trim: true)
+|> Enum.map(&String.to_integer/1)
+|> Enum.chunk_every(3, 1, :discard)
+|> Enum.chunk_every(2, 1, :discard)
+|> Enum.count(fn [n1, n2] -> Enum.sum(n2) > Enum.sum(n1) end)
+```
