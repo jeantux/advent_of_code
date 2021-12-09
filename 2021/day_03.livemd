@@ -1,3 +1,4 @@
+<!-- vim: set syntax=markdown: -->
 # Day 3 - Binary Diagnostic
 
 ## Setup
