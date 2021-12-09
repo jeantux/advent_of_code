@@ -1,3 +1,4 @@
+<!-- vim: set syntax=markdown: -->
 # Day 2: Dive!
 
 ## Setup
