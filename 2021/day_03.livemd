@@ -1,0 +1,91 @@
+# Day 3 - Binary Diagnostic
+
+## Setup
+
+```elixir
+Mix.install([
+  {:kino, "~> 0.4.1"}
+])
+```
+
+## Part One
+
+```elixir
+bit_reports = Kino.Input.textarea("List of reports: ")
+```
+
+```elixir
+data =
+  bit_reports
+  |> Kino.Input.read()
+  |> String.split("\n", trim: true)
+  |> Enum.map(fn numbers ->
+    numbers
+    |> String.split("", trim: true)
+    |> Enum.map(&String.to_integer/1)
+  end)
+
+# invert colums with rows
+data = for index <- 0..4, do: Enum.map(data, &Enum.at(&1, index))
+
+# convert [1, 1, 0, 0, 1] to 25
+bin_to_number = fn bits ->
+  Enum.reduce(bits, fn e, acc -> "#{acc}#{e}" end)
+  |> :erlang.binary_to_integer(2)
+end
+
+gamma =
+  Enum.map(data, fn list ->
+    zero? = Enum.count(list, &(&1 == 0)) > Enum.count(list, &(&1 == 1))
+    if zero?, do: 0, else: 1
+  end)
+
+epsilon = Enum.map(gamma, &if(&1 == 0, do: 1, else: 0))
+
+epsilon = bin_to_number.(epsilon)
+gamma = bin_to_number.(gamma)
+
+gamma * epsilon
+```
+
+## Part Two
+
+```elixir
+defmodule LifeSupport do
+  def rating(reports, :o2) do
+    reports
+    |> check_rating(&if(&1 >= &2, do: 1, else: 0), 0)
+  end
+
+  def rating(reports, :co2) do
+    reports
+    |> check_rating(&if(&2 <= &1, do: 0, else: 1), 0)
+  end
+
+  def check_rating([last_report], _r, _i), do: last_report
+
+  def check_rating(reports, remain_fn, index) do
+    zero = Enum.count(reports, &(Enum.at(&1, index) == 0))
+    one = Enum.count(reports, &(Enum.at(&1, index) == 1))
+
+    remain = remain_fn.(one, zero)
+    reports = Enum.filter(reports, &(Enum.at(&1, index) == remain))
+    check_rating(reports, remain_fn, index + 1)
+  end
+end
+
+reports =
+  bit_reports
+  |> Kino.Input.read()
+  |> String.split("\n", trim: true)
+  |> Enum.map(fn numbers ->
+    numbers
+    |> String.split("", trim: true)
+    |> Enum.map(&String.to_integer/1)
+  end)
+
+o2 = LifeSupport.rating(reports, :o2) |> bin_to_number.()
+co2 = LifeSupport.rating(reports, :co2) |> bin_to_number.()
+
+co2 * o2
+```
